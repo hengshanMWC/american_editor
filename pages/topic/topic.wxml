@@ -1,1 +1,1 @@
-<xing-editor bindfinish="finish" output-type="html" image-upload-url="http://localhost:3000/upload" image-upload-name="image" image-upload-key-chain="image.url" xingText="{{xingText}}" html="{{html}}" title="{{title}}" prop-show="{{aShow}}" button-background-color="#FECF10" />
+<xing-editor bindfinish="finish" output-type="html" image-upload-url="http://localhost:3000/upload" image-upload-name="image" image-upload-key-chain="image.url" xingText="{{xingText}}" html="{{html}}" title="{{title}}" prop-show="{{aShow}}" bindinput="onInput" button-background-color="#FECF10" />

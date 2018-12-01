@@ -1,5 +1,5 @@
 <!--components/xing-editor.wxml-->
-<input class="editor-title" value="{{title}}" placeholder='请输入话题标题' bindtap="tapHide" />
+<input class="editor-title" value="{{title}}" bindinput="onInput" placeholder='请输入话题标题' bindtap="tapHide" />
 <view
   class="editor-wrapper"
   style="min-height: {{windowHeight}}px"
@@ -18,7 +18,9 @@
           value="{{node.children[0].text}}"
           auto-height
           maxlength="-1"
+          disabled
           data-index="{{index}}"
+          bindtap="toText"
           >
         </textarea>
       </block>

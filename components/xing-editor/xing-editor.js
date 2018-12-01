@@ -56,15 +56,20 @@ Component({
     //
     nodeList: [],
     //元素：p的content，其他为undefined
-    textBufferPool: [],
     aShow: [],//显示隐藏操作
   },
 
   pageLifetimes :{
     show() {
-      let { text, index} = app.globalData.xing;
-      if(text){
-        this.addText();
+      let { text, index, type } = app.globalData.xing;
+      let nodeList = this.data.nodeList;
+      if (text && type === 'addText'){
+        this.addText();//添加
+      } else if (text && nodeList[index]){
+        this.editorData(index, text);//修改
+      //因为触发一些获取图片之类的api会触发show生命周期
+      } else if(index !== ''){
+        this.editorData(index);//删除
       }
     }
   },
@@ -94,41 +99,40 @@ Component({
      * attached生命周期的nodes和html的初始化
      */
     analysis(nodeList, aShow) {
-      const textBufferPool = [];
-      nodeList.forEach((node, index) => {
-        aShow.push(false);
-        if (node.name === 'p') {
-          textBufferPool[index] = node.children[0].text;
-        }
-      })
+      nodeList.forEach(node =>  aShow.push(false))
       this.setData({
-        textBufferPool,
         nodeList,
         aShow,
       })
     },
+
+    toString(val) {
+      return Object.prototype.toString.call(val)
+    },
+
     /**
      * 每次修改nodeList
      */
     editorData(index, node) {
-      let { nodeList, textBufferPool, aShow } = this.data
-      const arr = [nodeList, textBufferPool, aShow];
-      console.log(index);
+      let { nodeList, aShow } = this.data
+      const arr = [nodeList, aShow];
       //是否添加
-      if(node){
+      if (this.toString(node) === '[object Object]'){
         //img和video的text为undefined
-        let text = node.children && node.children[0].text || undefined;
-        const element = [node, text, false]
+        const element = [node, false]
         arr.forEach((val, i) => val.splice(index + 1, 0, element[i]))
         aShow = this.hide();
+      //是否修改
+      } else if (this.toString(node) === '[object String]') {
+        nodeList[index].children[0].text = node;
       } else {
-        arr.forEach( val => val.splice(index, 1))
+        arr.forEach(val => val.splice(index, 1))
       }
       this.setData({
         nodeList,
-        textBufferPool,
         aShow,
       })
+      app.clearXing();
     },
     
     hide() {
@@ -150,22 +154,30 @@ Component({
       })
     },
 
+    onInput(e) {
+      this.triggerEvent('input', e.detail.value);
+    },
+
     /**
      * 事件：进入文本页面
      */
     toText: function (e) {
-      // this.writeTextToNode();
-      let index = e.detail
-      const textBufferPool = this.data.textBufferPool
       const xing = app.globalData.xing;
-      xing.text = textBufferPool.length > index ? '' : textBufferPool[index];
-      xing.index = index;
+      xing.type = e.type;
+      //addText为添加，否则为修改
+      if (xing.type === 'addText') {
+        xing.index = e.detail
+      } else {
+        xing.index = e.currentTarget.dataset.index
+        xing.text = this.data.nodeList[xing.index].children[0].text;
+      }
       wx.navigateTo({
         url: `/pages/editor-text/editor-text`
       });
     },
 
     addText(){
+      let { text, index } = app.globalData.xing;
       const node = {
         name: 'p',
         attrs: {
@@ -173,18 +185,17 @@ Component({
         },
         children: [{
           type: 'text',
-          text: app.globalData.xing.text,
+          text: text,
         }]
       }
-      this.editorData(app.globalData.xing.index, node);
-      app.clearXing();
+      this.editorData(index, node);
     },
 
     /**
      * 事件：添加图片
      */
     addImage: function (e) {
-      this.writeTextToNode();
+      // this.writeTextToNode();
       const index = e.detail;
       wx.chooseImage({
         success: res => {
@@ -216,7 +227,7 @@ Component({
      * 事件：删除节点
      */
     deleteNode: function (e) {
-      this.writeTextToNode();
+      // this.writeTextToNode();
       const index = e.currentTarget.dataset.index;
       this.editorData(index);
     },
@@ -229,7 +240,7 @@ Component({
       let { index, up } = dataset;
       //根据up判断是否为向上交换
       let contrast = up ? index - 1 : index;
-      let { nodeList, textBufferPool } = this.data;
+      let { nodeList } = this.data;
       let i = 0;
       function fnSort(a, b){
         if (i++ == contrast) {
@@ -238,25 +249,10 @@ Component({
         return 0;
       }
       nodeList.sort(fnSort)
-      i = 0;
-      textBufferPool.sort(fnSort)
       this.setData({
         nodeList,
-        textBufferPool,
       })
     },
-
-    /**
-     * 事件：文本输入
-     */
-    // onTextareaInput: function (e) {
-    //   const index = e.currentTarget.dataset.index;
-    //   let textBufferPool = this.data.textBufferPool;
-    //   textBufferPool[index] = e.detail.value;
-    //   this.setData({
-    //     textBufferPool,
-    //   })
-    // },
 
     /**
      * 事件：提交内容
@@ -265,7 +261,6 @@ Component({
       wx.showLoading({
         title: '正在保存',
       })
-      this.writeTextToNode();//只针对p标签
       this.handleOutput();
     },
 
@@ -299,21 +294,6 @@ Component({
       s = s.replace(/&quot;/g, "\"");
       s = s.replace(/<br>/g, "\n");
       return s;
-    },
-
-    /**
-     * 方法：将缓冲池的文本写入节点
-     */
-    writeTextToNode: function (e) {
-      const { nodeList, textBufferPool } = this.data;
-      nodeList.forEach((node, index) => {
-        if (node.name === 'p') {
-          node.children[0].text = textBufferPool[index];
-        }
-      })
-      this.setData({
-        nodeList,
-      })
     },
 
     /**

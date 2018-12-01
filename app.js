@@ -12,6 +12,7 @@ App({
     xing: {
       text: '',//储存文字
       index: '',//储存下标
+      type: '',//操作类型
     },
     userInfo: null,
   }
