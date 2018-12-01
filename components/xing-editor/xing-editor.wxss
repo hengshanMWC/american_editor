@@ -1,0 +1,81 @@
+/* components/xing-editor.wxss */
+.editor-title {
+  background: #fff;
+  font-size: 30rpx;
+  color: #333;
+  height: 110rpx;
+  width: 100%;
+  padding: 32rpx;
+  box-sizing: border-box;
+  border-top: 1rpx solid #ccc;
+}
+
+.editor-wrapper {
+  width: 750rpx;
+  background: #F6F6F6;
+  padding: 16rpx 0;
+  box-sizing: border-box;
+  margin-bottom: 100rpx;
+}
+
+.editor-submit-btn {
+  height: 100rpx;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  border-radius: 0;
+  z-index: 11;
+}
+
+.editor-submit-btn::before, .editor-submit-btn::after {
+  border: none;
+}
+
+.editor-node-wrapper {
+  min-height: 200rpx;
+  position: relative;
+  width: 700rpx;
+  margin: 30rpx auto;
+  padding: 20rpx 0;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+}
+.editor-image-box {
+  margin: 0 36rpx;
+  display:flex;
+}
+.editor-image-box, 
+.editor-node-image {
+  width: 16rpx;
+}
+
+.reversal {
+  position: relative;
+}
+.editor-node-image-bottom {
+  position: absolute;
+  bottom: 0;
+}
+
+.editor-node-image {
+  height: 16rpx;
+}
+
+.editor-textarea {
+  display: block;
+  width: 100%;
+  min-height: 2.5em;
+  font-size: 30rpx;
+  align-self:center;
+}
+
+.editor-image {
+  display: block;
+  width: 700rpx;
+}

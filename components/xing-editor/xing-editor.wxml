@@ -1,0 +1,39 @@
+<!--components/xing-editor.wxml-->
+<input class="editor-title" value="{{title}}" placeholder='请输入话题标题' bindtap="tapHide" />
+<view
+  class="editor-wrapper"
+  style="min-height: {{windowHeight}}px"
+  scroll-y
+  enable-back-to-top
+  bindtap="tapHide">
+  <editor-add show="{{aShow[0]}}" index="-1" bindeditor="editor" bindaddText="toText" bindaddImage="addImage" bindaddVideo="addVideo"></editor-add> 
+  <block wx:for="{{nodeList}}" wx:for-item="node" wx:for-index="index" wx:key="{{index}}">
+    <view class="editor-node-wrapper">
+      <view class="editor-image-box">
+        <image class="editor-node-image" src="/assets/image/error.png" data-index="{{index}}" catchtap="deleteNode"></image>
+      </view>
+      <block wx:if="{{node.name === 'p'}}">
+        <textarea
+          class="editor-textarea"
+          value="{{node.children[0].text}}"
+          auto-height
+          maxlength="-1"
+          data-index="{{index}}"
+          >
+        </textarea>
+      </block>
+      <block wx:if="{{node.name === 'img'}}">
+        <image class="editor-image" src="{{node.attrs.src}}" style="height: {{node.attrs._height * 700}}rpx"></image>
+      </block>
+      <view class="editor-image-box reversal">
+        <image class="editor-node-image" src="/assets/image/top.png" wx:if="{{index != 0}}" data-index="{{index}}" data-up="{{true}}" catchtap="exchange"></image>
+        <image class="editor-node-image editor-node-image-bottom" src="/assets/image/bottom.png" wx:if="{{index != nodeList.length - 1}}" data-index="{{index}}" catchtap="exchange"></image>
+      </view>
+    </view>
+    <editor-add show="{{aShow[1 + index]}}" index="{{index}}" bindeditor="editor" bindaddText="toText" bindaddImage="addImage" bindaddVideo="addVideo"></editor-add> 
+  </block>
+  <button
+    class="editor-submit-btn"
+    style="background-color: {{buttonBackgroundColor}}; color: {{buttonTextColor}}"
+    catchtap="onFinish">完成</button>
+</view>

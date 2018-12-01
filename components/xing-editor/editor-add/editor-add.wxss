@@ -1,0 +1,54 @@
+/* components/xing-editor/editor-add/editor-add.wxss */
+.editor-add-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+}
+
+.editor-bottom {
+  width: 56rpx;
+  height: 56rpx;
+}
+.editor-add-box {
+  background: #fff;
+  position: absolute;
+  box-sizing: border-box;
+  padding: 16rpx 54rpx;
+  border-radius: 80rpx;
+  display: flex;
+  margin-top: 120rpx;
+  box-shadow: 0 5rpx 20rpx #ccc;
+  z-index:10;
+}
+
+.editor-arrow {
+  height: 0;
+  border-width: 0 30rpx 30rpx;
+  border-style: solid;
+  border-color: transparent transparent #fff;/*透明 透明  灰*/
+  position: absolute;
+  top: -29rpx;
+  transform: translateX(160%);
+}
+
+.editor-add-box .editor-box:not(:last-child) {
+  margin-right: 60rpx
+}
+
+.editor-box {
+  font-size: 25rpx;
+  color: #111;
+}
+
+.editor-box text {
+  display: block;
+  margin-left:-4rpx;
+}
+
+.editor-add {
+  width: 38rpx;
+  height: 32rpx;
+  margin-bottom: 10rpx;
+}

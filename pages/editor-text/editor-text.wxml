@@ -1,0 +1,16 @@
+<!--pages/editor-text/editor-text.wxml-->
+<view>
+  <textarea
+    class="editor-textarea"
+    value="{{text}}"
+    maxlength="5000"
+    bindfocus="appear"
+    bindblur="goAway"
+    placeholder="请输入内容"
+    bindinput="onTextareaInput">
+  </textarea>
+  <text class="editor-text">{{text.length}}/5000</text>
+  <view class="editor-bottom" wx:if="{{show}}" bindtap="complete" >
+    <text class="editor-bottom-text">完成</text>
+  </view>
+</view>

@@ -1,0 +1,15 @@
+var add = [
+  {
+    text: "文字",
+    image: "text",
+  },
+  {
+    text: "图片",
+    image: "image",
+  },
+  {
+    text: "视频",
+    image: "video",
+  }
+] 
+module.exports = add;

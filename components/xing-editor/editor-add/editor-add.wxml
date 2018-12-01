@@ -1,0 +1,12 @@
+<!--components/xing-editor/editor-add/editor-add.wxml-->
+<wxs module="static" src="./static.wxs"></wxs>
+<view class="editor-add-wrapper">
+  <image src="/assets/image/add{{show ? '_a' : ''}}.png" class="editor-bottom" data-index="{{index}}" catchtap="editor"></image>
+  <view class="editor-add-box" wx:if="{{show}}" catchtap="''">
+    <view class="editor-arrow"></view>
+    <view class="editor-box" data-index="{{index}}" data-text="{{item.text}}" catchtap="add" wx:for="{{static}}" wx:for-index="i" wx:key="{{i}}">
+      <image src="/assets/image/{{item.image}}.png" class="editor-add"></image>
+      <text>{{item.text}}</text>
+    </view>
+  </view>
+</view>

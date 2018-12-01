@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "pages/topic/topic",
+    "pages/editor-text/editor-text"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "black"
+  }
+}
