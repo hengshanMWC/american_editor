@@ -4,7 +4,7 @@ Component({
    * 组件的属性列表
    */
   properties: {
-    show: Boolean,
+    show: Object,
     index: null
   },
 
@@ -12,7 +12,7 @@ Component({
    * 组件的初始数据
    */
   data: {
-
+    scale: null,
   },
 
   /**
@@ -20,7 +20,17 @@ Component({
    */
   methods: {
     editor(e) {
-      this.triggerEvent('editor', ++e.currentTarget.dataset.index);
+      const query = wx.createSelectorQuery().in(this);
+      // query.selectViewport().scrollOffset()
+      this.triggerEvent('editor', { 
+        index: ++e.currentTarget.dataset.index,
+        query
+      });
+      // this.setData({
+      //   scale: wx.createAnimation({
+      //     duration: 1000
+      //   }).scale(0, 0)
+      // })
     },
     add(e) {
       const text = e.currentTarget.dataset.text;

@@ -45,14 +45,24 @@
   background: #fff;
   box-sizing: border-box;
   display: flex;
+  transform: translateX(150%);
+  animation: lr 1s infinite;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
+
+@keyframes lr {
+  from { transform: translateX(150%) }
+  to { transform: translateX(0) }
+}
+
 .editor-image-box {
   margin: 0 36rpx;
   display:flex;
 }
 .editor-image-box, 
 .editor-node-image {
-  width: 16rpx;
+  width: 32rpx;
 }
 
 .reversal {
@@ -64,10 +74,11 @@
 }
 
 .editor-node-image {
-  height: 16rpx;
+  height: 32rpx;
 }
 
 .editor-textarea {
+  word-break: break-all;
   display: block;
   width: 100%;
   min-height: 2.5em;

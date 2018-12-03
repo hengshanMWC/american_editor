@@ -5,7 +5,6 @@ Page({
     html: '',
     xingText: '',
     title: '',
-    aShow: [ true ],
   },
 
   onInput(e){

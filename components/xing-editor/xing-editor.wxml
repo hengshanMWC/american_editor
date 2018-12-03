@@ -1,19 +1,29 @@
 <!--components/xing-editor.wxml-->
 <input class="editor-title" value="{{title}}" bindinput="onInput" placeholder='请输入话题标题' bindtap="tapHide" />
 <view
+  id="editor-wrapper"
   class="editor-wrapper"
   style="min-height: {{windowHeight}}px"
   scroll-y
   enable-back-to-top
   bindtap="tapHide">
   <editor-add show="{{aShow[0]}}" index="-1" bindeditor="editor" bindaddText="toText" bindaddImage="addImage" bindaddVideo="addVideo"></editor-add> 
-  <block wx:for="{{nodeList}}" wx:for-item="node" wx:for-index="index" wx:key="{{index}}">
-    <view class="editor-node-wrapper">
+  <block wx:for="{{nodeList}}" wx:for-item="node" wx:key="{{Math.random()}}" >
+    <view class="editor-node-wrapper" style="transform:translateX({{windowWidth}}px)">
       <view class="editor-image-box">
         <image class="editor-node-image" src="/assets/image/error.png" data-index="{{index}}" catchtap="deleteNode"></image>
       </view>
       <block wx:if="{{node.name === 'p'}}">
-        <textarea
+        <view
+        class="editor-textarea"
+        auto-height
+        maxlength="-1"
+        disabled
+        data-index="{{index}}"
+        bindtap="toText">
+        {{node.children[0].text}}
+        </view>
+        <!-- <textarea
           class="editor-textarea"
           value="{{node.children[0].text}}"
           auto-height
@@ -22,10 +32,13 @@
           data-index="{{index}}"
           bindtap="toText"
           >
-        </textarea>
+        </textarea> -->
       </block>
-      <block wx:if="{{node.name === 'img'}}">
+      <block wx:if="{{node.name === 'image'}}">
         <image class="editor-image" src="{{node.attrs.src}}" style="height: {{node.attrs._height * 700}}rpx"></image>
+      </block>
+      <block wx:if="{{node.name === 'video'}}">
+        <video class="editor-image" src="{{node.attrs.src}}" style="height: {{node.attrs._height * 700}}rpx"></video>
       </block>
       <view class="editor-image-box reversal">
         <image class="editor-node-image" src="/assets/image/top.png" wx:if="{{index != 0}}" data-index="{{index}}" data-up="{{true}}" catchtap="exchange"></image>

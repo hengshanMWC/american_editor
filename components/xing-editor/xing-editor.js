@@ -5,12 +5,23 @@ Component({
    * 组件的属性列表
    */
   properties: {
-    //图片上传相关属性，参考wx.uploadFile
+    //上传相关属性，参考wx.uploadFile
     imageUploadUrl: String,
     imageUploadName: String,
     imageUploadHeader: Object,
     imageUploadFormData: Object,
     imageUploadKeyChain: String, //例：'image.url'
+
+     videoUploadUrl: String,
+     videoUploadName: String,
+     videoUploadHeader: Object,
+     videoUploadFormData: Object,
+     videoUploadKeyChain: String, //例：'video.url'
+
+    //图片和照片公共
+    uploadUrl: String,
+    uploadHeader: Object,
+    uploadFormData: Object,
 
     //是否在选择图片后立即上传
     // uploadImageWhenChoose: {
@@ -42,10 +53,6 @@ Component({
       type:String,
       value: '',
     },
-    propShow: {
-      type: Array,
-      value: [true],
-    },
   },
 
   /**
@@ -56,7 +63,12 @@ Component({
     //
     nodeList: [],
     //元素：p的content，其他为undefined
-    aShow: [],//显示隐藏操作
+    aShow: [{
+      b: true,//显示隐藏
+      direction: 'bottom',//箭头方向
+    }],
+    //新增动画
+    runOver: [],
   },
 
   pageLifetimes :{
@@ -68,7 +80,7 @@ Component({
       } else if (text && nodeList[index]){
         this.editorData(index, text);//修改
       //因为触发一些获取图片之类的api会触发show生命周期
-      } else if(index !== ''){
+      } else if (index !== '' && type !== 'addText'){
         this.editorData(index);//删除
       }
     }
@@ -77,17 +89,16 @@ Component({
   attached: function () {
     //获得手机高度设置成组件的最少高度
     const { windowHeight } = wx.getSystemInfoSync();
-    const aShow = this.properties.propShow;
+    let { aShow, runOver } = this.data
     this.setData({
       windowHeight,
-      aShow,
     })
     //判断用的是nodes还是html
     if (this.properties.nodes && this.properties.nodes.length > 0) {
-      this.analysis(this.properties.nodes, aShow)
+      this.analysis(this.properties.nodes, aShow, runOver)
     } else if (this.properties.html) {
       const nodeList = this.HTMLtoNodeList();
-      this.analysis(nodeList, aShow)
+      this.analysis(nodeList, aShow, runOver)
     }
   },
 
@@ -98,11 +109,18 @@ Component({
     /**
      * attached生命周期的nodes和html的初始化
      */
-    analysis(nodeList, aShow) {
-      nodeList.forEach(node =>  aShow.push(false))
+    analysis(nodeList, aShow, runOver) {
+      nodeList.forEach(node => {
+        aShow.push({ 
+          b: false, 
+          direction: 'bottom' 
+        })
+        runOver.push(this.translateX)
+      })
       this.setData({
         nodeList,
         aShow,
+        runOver,
       })
     },
 
@@ -110,33 +128,68 @@ Component({
       return Object.prototype.toString.call(val)
     },
 
+    translateX() {
+      return wx.createAnimation().translateX(0).step().export()                
+    },
+
     /**
      * 每次修改nodeList
      */
     editorData(index, node) {
-      let { nodeList, aShow } = this.data
+      let { nodeList, aShow, runOver } = this.data
       const arr = [nodeList, aShow];
       //是否添加
       if (this.toString(node) === '[object Object]'){
         //img和video的text为undefined
-        const element = [node, false]
+        const element = [node, {
+          b: false,
+          direction: 'bottom'
+        }]
+        arr.push(runOver)
         arr.forEach((val, i) => val.splice(index + 1, 0, element[i]))
         aShow = this.hide();
+        runOver[Number(index) + 1] = this.translateX();
+        this.goBottom('#editor-wrapper')
       //是否修改
       } else if (this.toString(node) === '[object String]') {
         nodeList[index].children[0].text = node;
+        runOver[index] = this.translateX();
+        this.goBottom('#editor-wrapper')
       } else {
+        arr.push(runOver)
         arr.forEach(val => val.splice(index, 1))
       }
       this.setData({
         nodeList,
         aShow,
+        runOver,
       })
+      console.log(nodeList);
       app.clearXing();
     },
-    
-    hide() {
-      return this.data.aShow.map( val => val = false);
+
+    goBottom(id) {
+      wx.createSelectorQuery().in(this)
+        .select(id).boundingClientRect()
+        .selectViewport().scrollOffset()
+        .exec(res => {
+          let height = res[0].height
+          if (height - res[1].scrollTop - this.data.windowHeight > 0) {
+            wx.pageScrollTo({
+              scrollTop: height
+            })
+          }
+        })
+    },
+
+    hide(i) {
+      return this.data.aShow.map( (val, index) => {
+        if(i === index) return val;
+        return {
+          b: false,//显示隐藏
+          direction: 'bottom',//箭头方向
+        }
+      });
     },
 
     tapHide(){
@@ -146,11 +199,22 @@ Component({
     },
 
     editor(e) {
-      let i = e.detail;
-      const aShow = this.data.aShow;
-      aShow[i] = !aShow[i];
-      this.setData({
-        aShow
+      let windowHeight = this.data.windowHeight
+      let { index: i, query } = e.detail;
+      query
+      .select('#add-bottom').boundingClientRect()
+      .select('#add-box').boundingClientRect()
+      .select('#arrow').boundingClientRect()
+      .exec( res => {
+        const aShow = this.hide(i);
+        aShow[i] = {
+          b: !aShow[i].b,
+          //三角形 + margin-top
+          direction: res[0].top + res[1].height + res[2].height + 120 > windowHeight ? 'top' : 'bottom'
+        };
+        this.setData({
+          aShow
+        })
       })
     },
 
@@ -182,6 +246,7 @@ Component({
         name: 'p',
         attrs: {
           class: 'xing-p',
+          //  _id: Math.random()
         },
         children: [{
           type: 'text',
@@ -197,6 +262,7 @@ Component({
     addImage: function (e) {
       // this.writeTextToNode();
       const index = e.detail;
+
       wx.chooseImage({
         success: res => {
           const tempFilePath = res.tempFilePaths[0];
@@ -204,11 +270,12 @@ Component({
             src: tempFilePath,
             success: res => {
               const node = {
-                name: 'img',
+                name: 'image',
                 attrs: {
                   class: 'xing-img',
                   style: 'width: 100%',
                   src: tempFilePath,
+                  // _id: Math.random(),
                   /**
                    * 父组件传的参数是html或者nodes都是_height(被比例过的)
                    * onFinish提交出来的html也是_height(被比例过的)
@@ -220,6 +287,32 @@ Component({
             }
           })
         },
+      })
+    },
+
+    /**
+     * 事件：添加视频
+     */
+    addVideo(e) {
+      const index = e.detail;
+      wx.chooseVideo({
+        success: res => {
+          const node = {
+            name: 'video',
+            attrs: {
+              class: 'xing-img',
+              style: 'width: 100%',
+              src: res.tempFilePath,
+              // _id: Math.random(),
+              /**
+               * 父组件传的参数是html或者nodes都是_height(被比例过的)
+               * onFinish提交出来的html也是_height(被比例过的)
+               */
+              _height: res.height / res.width,
+            },
+          }
+          this.editorData(index, node);
+        }
       })
     },
 
@@ -304,7 +397,6 @@ Component({
       let htmlNodeList = [];
       while (html.length > 0) {
         const endTag = html.match(/<\/[a-z0-9]+>/);
-        console.log();
         if (!endTag) break;
         const htmlNode = html.substring(0, endTag.index + endTag[0].length);
         htmlNodeList.push(htmlNode);
@@ -339,25 +431,26 @@ Component({
     },
 
     /**
-     * 方法：上传图片
+     * 方法：上传文件
      */
-    uploadImage: function (node) {
+    upload: function (node, nodeName) {
+      const properties = this.properties;
+      let url = properties[nodeName + 'UploadUrl'] || properties.uploadUrl;
+      let name = properties[nodeName + 'UploadName'];
+      let header = properties[nodeName + 'UploadHeader'] || properties.uplHeader;
+      let formData = properties[nodeName + 'UploadFormData'] || properties.uploaFormData;
       return new Promise(resolve => {
         let options = {
           filePath: node.attrs.src,
-          url: this.properties.imageUploadUrl,
-          name: this.properties.imageUploadName,
+          url,
+          name,
+          header,
+          formData
         }
-        if (this.properties.imageUploadHeader) {
-          options.header = this.properties.imageUploadHeader;
-        }
-        if (this.properties.imageUploadFormData) {
-          options.formData = this.properties.imageUploadFormData;
-        }
+
         options.success = res => {
           //解析对象属性
-          const keyChain = this.properties.imageUploadKeyChain.split('.');
-          console.log(keyChain);
+          const keyChain = properties[nodeName+'UploadKeyChain'].split('.');
           let url = JSON.parse(res.data);
           keyChain.forEach(key => {
             url = url[key];
@@ -387,8 +480,8 @@ Component({
       }
       const node = nodeList[index];
       //_uploaded判断是否已经上传过
-      if (node.name === 'img' && !node.attrs._uploaded) {
-        this.uploadImage(node).then(() => {
+      if (node.name !== 'p' && !node.attrs._uploaded) {
+        this.upload(node, node.name).then(() => {
           this.handleOutput(index + 1)
         });
       } else {

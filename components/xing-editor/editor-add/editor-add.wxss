@@ -11,29 +11,47 @@
   width: 56rpx;
   height: 56rpx;
 }
-.editor-add-box {
+.editor-add-box-bottom,
+.editor-add-box-top {
   background: #fff;
   position: absolute;
   box-sizing: border-box;
   padding: 16rpx 54rpx;
   border-radius: 80rpx;
   display: flex;
-  margin-top: 120rpx;
-  box-shadow: 0 5rpx 20rpx #ccc;
   z-index:10;
+  box-shadow: 0 5rpx 20rpx #ccc;
 }
 
-.editor-arrow {
+.editor-add-box-top {
+  transform: translateY(-120rpx)
+}
+
+.editor-add-box-bottom {
+  margin-top: 120rpx;
+}
+.editor-arrow-bottom,
+.editor-arrow-top {
   height: 0;
-  border-width: 0 30rpx 30rpx;
   border-style: solid;
-  border-color: transparent transparent #fff;/*透明 透明  灰*/
   position: absolute;
-  top: -29rpx;
   transform: translateX(160%);
 }
 
-.editor-add-box .editor-box:not(:last-child) {
+.editor-arrow-bottom {
+  border-width: 0 30rpx 30rpx;
+  border-color: transparent transparent #fff;/*透明 透明  灰*/
+  top: -29rpx;
+}
+
+.editor-arrow-top {
+  border-width: 30rpx 30rpx 0;
+  border-color: #fff transparent transparent;/*透明 透明  灰*/
+  bottom: -29rpx;
+}
+
+.editor-add-box-bottom .editor-box:not(:last-child),
+.editor-add-box-top .editor-box:not(:last-child) {
   margin-right: 60rpx
 }
 
