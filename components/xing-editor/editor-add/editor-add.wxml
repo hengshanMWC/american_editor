@@ -1,8 +1,8 @@
 <!--components/xing-editor/editor-add/editor-add.wxml-->
 <wxs module="static" src="./static.wxs"></wxs>
 <view class="editor-add-wrapper">
-  <image src="/assets/image/add{{show.b ? '_a' : ''}}.png" class="editor-bottom" data-index="{{index}}" catchtap="editor" id="add-bottom"></image>
-  <view class="editor-add-box-{{show.direction}}" hidden="{{!show.b}}" catchtap="''" id="add-box" animation="{{scale}}">
+  <image src="/assets/image/add{{show.b ? '_a' : ''}}.png" class="editor-bottom" data-index="{{index}}" catchtap="editor" id="add-bottom" ></image>
+  <view class="editor-add-box-{{show.direction}}" hidden="{{!show.b}}" catchtap="''" id="add-box" animation="{{animation}}">
     <view id="arrow" class="editor-arrow-{{show.direction}}"></view>
     <view class="editor-box" data-index="{{index}}" data-text="{{item.text}}" catchtap="add" wx:for="{{static}}" wx:for-index="i" wx:key="{{i}}">
       <image src="/assets/image/{{item.image}}.png" class="editor-add"></image>

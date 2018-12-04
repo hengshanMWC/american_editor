@@ -1,5 +1,12 @@
 // components/xing-editor.js
 const app = getApp();
+let createX = {
+  duration: 600,
+}
+let aX = [[{
+  name: 'translateX',
+  num: 0,
+}]]
 Component({
   /**
    * 组件的属性列表
@@ -60,12 +67,14 @@ Component({
    */
   data: {
     windowHeight: 0,
+    pixelRatio: 0,
     //
     nodeList: [],
     //元素：p的content，其他为undefined
     aShow: [{
       b: true,//显示隐藏
       direction: 'bottom',//箭头方向
+      // animation: () => 
     }],
     //新增动画
     runOver: [],
@@ -88,10 +97,11 @@ Component({
 
   attached: function () {
     //获得手机高度设置成组件的最少高度
-    const { windowHeight } = wx.getSystemInfoSync();
+    const { windowHeight, pixelRatio } = wx.getSystemInfoSync();
     let { aShow, runOver } = this.data
     this.setData({
       windowHeight,
+      pixelRatio,
     })
     //判断用的是nodes还是html
     if (this.properties.nodes && this.properties.nodes.length > 0) {
@@ -110,26 +120,63 @@ Component({
      * attached生命周期的nodes和html的初始化
      */
     analysis(nodeList, aShow, runOver) {
+      aShow[0].b = false;
       nodeList.forEach(node => {
         aShow.push({ 
           b: false, 
           direction: 'bottom' 
         })
-        runOver.push(this.translateX)
+        runOver.push(this.dance(aX, createX))
       })
       this.setData({
         nodeList,
         aShow,
-        runOver,
       })
+      this.timeout({ runOver });
+    },
+
+    timeout(options, interval = 30){
+      setTimeout(() => this.setData(options), interval);
     },
 
     toString(val) {
       return Object.prototype.toString.call(val)
     },
 
-    translateX() {
-      return wx.createAnimation().translateX(0).step().export()                
+    /**
+     * {name:动画名称,num:动作幅度}只有一种动画效果一个step
+     * [{name:动画名称,num:动作幅度}]//只有一个step
+     * [[{name:动画名称,num:动作幅度}]]//有多个step
+     * 
+     */
+    dance(effect, create = {}) {
+      let animation = wx.createAnimation(create);
+      if (Array.isArray(effect)) {
+        let len = effect.length - 1;
+        effect.forEach((section, effectI) => {
+          if (Array.isArray(section)) {
+            len = section.length - 1;
+            section.reduce((total, action, actionI) => {
+              total[action.name](action.num);
+              if (len == actionI) {
+                return animation.step(action.step || {})
+              } else {
+                return animation
+              }
+            }, animation)
+          } else {
+            animation[section.name](section.num);
+            if (len == effectI) {
+              animation.step(section.step || {})
+            }
+          }
+
+        })
+      } else {
+        animation[effect.name](effect.num).step(effect.step || {})
+      }
+      
+      return animation.export();               
     },
 
     /**
@@ -148,13 +195,13 @@ Component({
         arr.push(runOver)
         arr.forEach((val, i) => val.splice(index + 1, 0, element[i]))
         aShow = this.hide();
-        runOver[Number(index) + 1] = this.translateX();
-        this.goBottom('#editor-wrapper')
+        runOver[Number(index) + 1] = this.dance(aX, createX);
+        // this.goBottom('#editor-wrapper')
       //是否修改
       } else if (this.toString(node) === '[object String]') {
         nodeList[index].children[0].text = node;
-        runOver[index] = this.translateX();
-        this.goBottom('#editor-wrapper')
+        runOver[index] = this.dance(aX, createX);
+        // this.goBottom('#editor-wrapper')
       } else {
         arr.push(runOver)
         arr.forEach(val => val.splice(index, 1))
@@ -162,12 +209,17 @@ Component({
       this.setData({
         nodeList,
         aShow,
-        runOver,
       })
-      console.log(nodeList);
+      this.timeout({ runOver });
       app.clearXing();
     },
 
+    /**
+     * 标签的id，
+     * 到底部
+     * bug：如果我想在顶部添加，还是会弹到底部，这并不是我想要的
+     * 解决：要加判断，先不解决
+     */
     goBottom(id) {
       wx.createSelectorQuery().in(this)
         .select(id).boundingClientRect()

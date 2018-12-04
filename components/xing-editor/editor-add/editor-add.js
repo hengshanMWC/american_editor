@@ -4,7 +4,25 @@ Component({
    * 组件的属性列表
    */
   properties: {
-    show: Object,
+    show: {
+      type: Object,
+      observer(newVal, oldVal) {
+        const { b, direction } = newVal;
+        // this.animation.scale(0, 0)
+        let oExport;
+        if(b) {
+          if (direction === 'bottom') {
+            oExport = this.animation.scale(1).step().export();
+          } else {
+            oExport = this.animation.scale(1).translateY(-60).step().export();
+          }
+        } else {
+          oExport = this.animation.scale(0).translateY(0).step().export();
+        }
+        setTimeout(() => this.setData({ animation: oExport }),30)
+      },
+    },
+    pixelRatio: Number,
     index: null
   },
 
@@ -15,23 +33,24 @@ Component({
     scale: null,
   },
 
+  created(){
+    this.animation = wx.createAnimation()
+  },
+
   /**
    * 组件的方法列表
    */
   methods: {
+
     editor(e) {
       const query = wx.createSelectorQuery().in(this);
       // query.selectViewport().scrollOffset()
       this.triggerEvent('editor', { 
         index: ++e.currentTarget.dataset.index,
         query
-      });
-      // this.setData({
-      //   scale: wx.createAnimation({
-      //     duration: 1000
-      //   }).scale(0, 0)
-      // })
+      });  
     },
+
     add(e) {
       const text = e.currentTarget.dataset.text;
       let map = {

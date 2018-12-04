@@ -46,15 +46,15 @@
   box-sizing: border-box;
   display: flex;
   transform: translateX(150%);
-  animation: lr 1s infinite;
+  /* animation: lr 1s infinite;
   animation-iteration-count: 1;
-  animation-fill-mode: forwards;
+  animation-fill-mode: forwards; */
 }
 
-@keyframes lr {
+/* @keyframes lr {
   from { transform: translateX(150%) }
   to { transform: translateX(0) }
-}
+} */
 
 .editor-image-box {
   margin: 0 36rpx;

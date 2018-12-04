@@ -7,9 +7,9 @@
   scroll-y
   enable-back-to-top
   bindtap="tapHide">
-  <editor-add show="{{aShow[0]}}" index="-1" bindeditor="editor" bindaddText="toText" bindaddImage="addImage" bindaddVideo="addVideo"></editor-add> 
-  <block wx:for="{{nodeList}}" wx:for-item="node" wx:key="{{Math.random()}}" >
-    <view class="editor-node-wrapper" style="transform:translateX({{windowWidth}}px)">
+  <editor-add pixelRatio="{{pixelRatio}}" show="{{aShow[0]}}" index="-1" bindeditor="editor" bindaddText="toText" bindaddImage="addImage" bindaddVideo="addVideo"></editor-add> 
+  <block wx:for="{{nodeList}}" wx:for-item="node" wx:key="{{Math.random()}}">
+    <view class="editor-node-wrapper" style="transform:translateX({{windowWidth}}px)" animation="{{runOver[index]}}">
       <view class="editor-image-box">
         <image class="editor-node-image" src="/assets/image/error.png" data-index="{{index}}" catchtap="deleteNode"></image>
       </view>
@@ -45,7 +45,7 @@
         <image class="editor-node-image editor-node-image-bottom" src="/assets/image/bottom.png" wx:if="{{index != nodeList.length - 1}}" data-index="{{index}}" catchtap="exchange"></image>
       </view>
     </view>
-    <editor-add show="{{aShow[1 + index]}}" index="{{index}}" bindeditor="editor" bindaddText="toText" bindaddImage="addImage" bindaddVideo="addVideo"></editor-add> 
+    <editor-add pixel-ratio="{{pixelRatio}}" show="{{aShow[1 + index]}}" index="{{index}}" bindeditor="editor" bindaddText="toText" bindaddImage="addImage" bindaddVideo="addVideo"></editor-add> 
   </block>
   <button
     class="editor-submit-btn"

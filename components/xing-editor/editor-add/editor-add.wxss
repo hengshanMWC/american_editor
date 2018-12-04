@@ -21,10 +21,11 @@
   display: flex;
   z-index:10;
   box-shadow: 0 5rpx 20rpx #ccc;
+  transform: scale(0, 0);
 }
 
 .editor-add-box-top {
-  transform: translateY(-120rpx)
+  
 }
 
 .editor-add-box-bottom {
@@ -41,7 +42,7 @@
 .editor-arrow-bottom {
   border-width: 0 30rpx 30rpx;
   border-color: transparent transparent #fff;/*透明 透明  灰*/
-  top: -29rpx;
+  top: -27rpx;
 }
 
 .editor-arrow-top {
